@@ -1,24 +1,57 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import HomePage from './components/HomePage.vue'
 </script>
 
 <template>
-  <header>
+      <header class="header">
+      <div>
+        <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="25" height="25" />
+      </div>
+      <nav class="navigation">
+        <ul>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">My Health</a></li>
+          <li><a href="#">About Us</a></li>
+        </ul>
+      </nav>
+      <div>
+
+      </div>
+    </header>
+  <!-- <header>
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
     </div>
-  </header>
+  </header> -->
 
   <main>
-    <TheWelcome />
+    <HomePage />
   </main>
 </template>
 
 <style scoped>
-header {
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: white;
+}
+
+.navigation ul {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.navigation li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+/* header {
   line-height: 1.5;
 }
 
@@ -43,5 +76,5 @@ header {
     place-items: flex-start;
     flex-wrap: wrap;
   }
-}
+} */
 </style>
