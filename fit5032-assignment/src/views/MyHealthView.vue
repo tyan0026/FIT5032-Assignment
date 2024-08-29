@@ -17,19 +17,19 @@
               
               <h3>Articles</h3>
               <p>Read our latest articles on elderly health, wellness, and nutrition.</p>
-              <router-link to="/articles" class="resource-button">Read More</router-link>
+              <!-- <router-link to="/articles" class="resource-button">Read More</router-link> -->
             </div>
             <div class="resource-item">
               
               <h3>Videos</h3>
               <p>Watch informative videos on managing your health and well-being.</p>
-              <router-link to="/videos" class="resource-button">Watch Now</router-link>
+              <!-- <router-link to="/videos" class="resource-button">Watch Now</router-link> -->
             </div>
             <div class="resource-item">
               
               <h3>Guides</h3>
               <p>Download our comprehensive health guides tailored to elderly needs.</p>
-              <router-link to="/guides" class="resource-button">Download Guides</router-link>
+              <!-- <router-link to="/guides" class="resource-button">Download Guides</router-link> -->
             </div>
           </div>
         </div>

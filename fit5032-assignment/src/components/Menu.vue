@@ -42,14 +42,15 @@ export default {
   setup() {
     const isLoggedIn = ref(false)
     const isAdmin = ref(false)
-    const users = JSON.parse(localStorage.getItem('currentUser'))
 
     const route = useRoute()
 
     const checkAuthStatus = () => {
-      isLoggedIn.value = users != null
-      if (users) {
-        isAdmin.value = users.isAdmin === 'true'
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+      isLoggedIn.value = currentUser != null
+
+      if (currentUser) {
+        isAdmin.value = currentUser.isAdmin === 'true'
       }
     }
 

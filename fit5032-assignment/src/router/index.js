@@ -8,7 +8,6 @@ import AboutUsView from '@/views/AboutUsView.vue'
 import LogoutView from '@/views/LogoutView.vue'
 import UsersView from '@/views/UsersView.vue'
 import RatingView from '@/views/RatingView.vue'
-import AverageRating from '@/components/AverageRating.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -16,7 +15,6 @@ const routes = [
   { path: '/register', name: 'Register', component: RegiterView },
   { path: '/about-us', name: 'AboutUs', component: AboutUsView },
   { path: '/rating', name: 'Rating', component: RatingView },
-  { path: '/average-rating', name: 'AverageRating', component: AverageRating },
   { path: '/my-health', name: 'MyHealth', component: MyHealthView },
   { path: '/services', name: 'Services', component: ServicesView },
   { path: '/users', name: 'Users', component: UsersView },

@@ -14,7 +14,6 @@ export default {
           Access essential health resources, connect with a supportive community, and take control
           of your well-being.
         </p>
-        <router-link to="/resources" class="hero-button">Explore Resources</router-link>
       </div>
     </section>
 
@@ -27,7 +26,6 @@ export default {
           elderly. Our mission is to provide accessible health resources and support to help older
           adults lead healthier, more fulfilling lives.
         </p>
-        <router-link to="/about" class="about-button">Learn More</router-link>
       </div>
     </section>
 
@@ -69,7 +67,6 @@ export default {
           Sign up and become part of a community dedicated to improving elderly health and
           well-being.
         </p>
-        <router-link to="/signup" class="cta-button">Sign Up Now</router-link>
       </div>
     </section>
   </div>
