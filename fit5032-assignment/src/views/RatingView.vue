@@ -35,21 +35,34 @@ import { ref, onMounted } from 'vue'
 
 const rating = ref(1)
 
+//get current user from database
 const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+
+//get current user's username
 const currentUsername = currentUser ? currentUser.username : ''
 
 const submitRating = () => {
+  //get all users from local storage
   const users = JSON.parse(localStorage.getItem('users')) || []
 
+  //find current user in the user list
   const userIndex = users.findIndex((user) => user.username === currentUsername)
 
+  //if user is found
   if (userIndex !== -1) {
+    //add or update its reting value
     users[userIndex].rating = rating.value
 
+    //write the updated users list back to local storage
     localStorage.setItem('users', JSON.stringify(users))
 
+    //reset the reting in the input field back to default 1
     rating.value = 1
+
+    //notify the user 
     window.alert('Thanks for your rating.')
+
+    //calculate the average rating
     calculateAverageRating()
   } else {
     console.error('Current user not found.')
@@ -59,12 +72,15 @@ const submitRating = () => {
 const averageRating = ref(null)
 
 const calculateAverageRating = () => {
+
+  //get all existing users 
   const users = JSON.parse(localStorage.getItem('users')) || []
 
   // Extract ratings from user objects
   const ratings = users.map((user) => user.rating).filter((rating) => rating != null)
 
   if (ratings.length > 0) {
+    //Calculate total value 
     const total = ratings.reduce((acc, curr) => acc + curr, 0)
     averageRating.value = total / ratings.length
   } else {
@@ -73,6 +89,7 @@ const calculateAverageRating = () => {
 }
 
 onMounted(() => {
+  //make sure this method is called when page load
   calculateAverageRating()
 })
 </script>

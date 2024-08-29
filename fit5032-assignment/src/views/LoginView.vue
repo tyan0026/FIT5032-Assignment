@@ -54,12 +54,18 @@ export default {
     const errorMessage = ref('')
     const router = useRouter()
 
+    //get all users from local storage
     const databaseUsers = JSON.parse(localStorage.getItem('users'));
 
     const login = () => {
+      //find the user based on its username and password
       const user = databaseUsers.find(a => a.username === username.value && a.password === password.value);
+
+      //If the user exists
       if (user) {
+        //record the current user in local storage
         localStorage.setItem('currentUser', JSON.stringify(user));
+        //redirect the user to home page
         router.push({ name: 'Home' });
       } else {
         errorMessage.value = 'Invalid username or password'
@@ -67,6 +73,7 @@ export default {
     }
 
     const goToRegister = () => {
+      //redirect the user to register page
       router.push({ name: 'Register' })
     }
 

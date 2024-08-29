@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
+//declare form data
 const formData = ref({
   username: '',
   password: '',
@@ -12,13 +13,19 @@ const formData = ref({
   suburb: 'Clayton'
 })
 
+//declare users variable - initialise it with the users array in local storage. If it doen't exist, initialise it with an empty array
 const users = ref(JSON.parse(localStorage.getItem('users')) || [])
 
 const submitForm = () => {
   validateName(true)
   validatePassword(true)
+  //when username and password are valid
   if (!errors.value.username && !errors.value.password) {
+
+    //add the newly registered user to the users list
     users.value.push({ ...formData.value })
+
+    //update users in the database
     localStorage.setItem('users', JSON.stringify(users.value))
     clearForm()
   }
@@ -36,6 +43,7 @@ const clearForm = () => {
   }
 }
 
+//define errors object
 const errors = ref({
   username: null,
   password: null,
@@ -46,7 +54,9 @@ const errors = ref({
   reason: null
 })
 
+//validate name when user removes cursor from the input field
 const validateName = (blur) => {
+  //check username length
   if (formData.value.username.length < 3) {
     if (blur) errors.value.username = 'Name must be at least 3 characters'
   } else {
@@ -54,14 +64,22 @@ const validateName = (blur) => {
   }
 }
 
+
+//validate password when user removes cursor from the input field
 const validatePassword = (blur) => {
+  //get password from formData
   const password = formData.value.password
   const minLength = 8
+  //define a regular expression for uppercase letters and test if password matches it
   const hasUppercase = /[A-Z]/.test(password)
+  //define a regular expression for lowercase letters and test if password matches it
   const hasLowercase = /[a-z]/.test(password)
+  //define a regular expression for numbers and test if password matches it
   const hasNumber = /\d/.test(password)
+  //define a regular expression for sepcial characters and test if password matches it
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
 
+  //set errors accordingly
   if (password.length < minLength) {
     if (blur) errors.value.password = `Password must be at least ${minLength} characters long.`
   } else if (!hasUppercase) {

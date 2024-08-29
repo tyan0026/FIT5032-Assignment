@@ -40,15 +40,21 @@ import { useRoute } from 'vue-router'
 
 export default {
   setup() {
+    //define some variables to indicate the current user's status and role
+    //This is used to contionally display some buttons or pages
     const isLoggedIn = ref(false)
     const isAdmin = ref(false)
 
     const route = useRoute()
 
     const checkAuthStatus = () => {
+      //get the current user
       const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+
+      //if user exists, then there is a logged in user
       isLoggedIn.value = currentUser != null
 
+      //check if the logged in user is admin or not
       if (currentUser) {
         isAdmin.value = currentUser.isAdmin === 'true'
       }
@@ -59,6 +65,7 @@ export default {
       checkAuthStatus()
     })
 
+    //check status on page load
     onMounted(() => {
       checkAuthStatus()
     })
