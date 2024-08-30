@@ -5,7 +5,7 @@
     </div>
     <nav class="navigation">
       <ul>
-        <li><router-link to="/" class="nav-link" active-class="active">Home</router-link></li>
+        <li><router-link to="/home" class="nav-link" active-class="active">Home</router-link></li>
         <li>
           <router-link to="/services" class="nav-link" active-class="active">Services</router-link>
         </li>
@@ -56,7 +56,7 @@ export default {
 
       //check if the logged in user is admin or not
       if (currentUser) {
-        isAdmin.value = currentUser.isAdmin === 'true'
+        isAdmin.value = currentUser.isAdmin === true
       }
     }
 

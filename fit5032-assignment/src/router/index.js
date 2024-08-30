@@ -10,7 +10,7 @@ import UsersView from '@/views/UsersView.vue'
 import RatingView from '@/views/RatingView.vue'
 
 const routes = [
-  { path: '/', name: 'Home', component: HomeView },
+  { path: '/home', name: 'Home', component: HomeView },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegiterView },
   { path: '/about-us', name: 'AboutUs', component: AboutUsView },
@@ -18,7 +18,8 @@ const routes = [
   { path: '/my-health', name: 'MyHealth', component: MyHealthView },
   { path: '/services', name: 'Services', component: ServicesView },
   { path: '/users', name: 'Users', component: UsersView },
-  { path: '/logout', name: 'Logout', component: LogoutView }
+  { path: '/logout', name: 'Logout', component: LogoutView },
+  { path: '', name: 'Login', component: LoginView },
 ]
 
 function isAuthenticated() {
@@ -33,7 +34,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // Check if the route requires authentication
-  if (to.name !== 'Login' && to.name !== 'Register' && !isAuthenticated()) {
+
+  console.log(to.name)
+  if (to.name !== undefined && to.name !== 'Login' && to.name !== 'Register' && !isAuthenticated()) {
     window.alert('Please login first. ');
     next({ name: 'Login' })
   } else {

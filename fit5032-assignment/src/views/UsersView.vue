@@ -21,7 +21,6 @@ onMounted(() => {
     <h4>Users</h4>
     <DataTable :value="users" tableStyle="min-width: 50rem">
       <Column field="username" header="Username"></Column>
-      <Column field="password" header="Password"></Column>
       <Column field="isAustralian" header="Australian Resident"></Column>
       <Column field="gender" header="Gender"></Column>
       <Column field="reason" header="Reason"></Column>

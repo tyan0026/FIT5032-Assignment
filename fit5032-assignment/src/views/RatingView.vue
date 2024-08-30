@@ -23,7 +23,14 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="row mt-5">
+    <h2>User Ratings</h2>
+    <DataTable :value="userRatings" tableStyle="min-width: 50rem">
+      <Column field="username" header="Username"></Column>
+      <Column field="rating" header="Rating"></Column>
+    </DataTable>
+  </div>
+  <div style="margin-top: 20px;">
     <h2>Average Rating</h2>
     <p v-if="averageRating !== null">{{ averageRating.toFixed(2) }} / 5</p>
     <p v-else>No ratings yet.</p>
@@ -32,6 +39,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const rating = ref(1)
 
@@ -63,6 +72,7 @@ const submitRating = () => {
     window.alert('Thanks for your rating.')
 
     //calculate the average rating
+    updateRatingsTable();
     calculateAverageRating()
   } else {
     console.error('Current user not found.')
@@ -70,6 +80,7 @@ const submitRating = () => {
 }
 
 const averageRating = ref(null)
+const userRatings = ref([])
 
 const calculateAverageRating = () => {
 
@@ -88,9 +99,14 @@ const calculateAverageRating = () => {
   }
 }
 
+const updateRatingsTable = () => {
+  userRatings.value = JSON.parse(localStorage.getItem('users')).filter(a => a.rating != undefined) || []
+}
+
 onMounted(() => {
   //make sure this method is called when page load
-  calculateAverageRating()
+  calculateAverageRating();
+  updateRatingsTable();
 })
 </script>
 

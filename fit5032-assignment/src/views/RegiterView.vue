@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue'
+import LoginView from './LoginView.vue';
+import router from '@/router';
 
 //declare form data
 const formData = ref({
@@ -28,6 +30,7 @@ const submitForm = () => {
     //update users in the database
     localStorage.setItem('users', JSON.stringify(users.value))
     clearForm()
+    router.push({name : "Login"})
   }
 }
 
