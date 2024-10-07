@@ -6,12 +6,12 @@
 
         <form @submit.prevent="login" class="card p-4">
           <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
+            <label for="email" class="form-label">Email</label>
             <input
               type="text"
-              id="username"
+              id="email"
               class="form-control"
-              v-model="username"
+              v-model="email"
               required
             />
           </div>
@@ -46,39 +46,33 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default {
   setup() {
-    const username = ref('')
+    const email = ref('')
     const password = ref('')
     const errorMessage = ref('')
     const router = useRouter()
 
-    //get all users from local storage
-    const databaseUsers = JSON.parse(localStorage.getItem('users'));
 
     const login = () => {
-      //find the user based on its username and password
-      const user = databaseUsers.find(a => a.username === username.value && a.password === password.value);
-
-      //If the user exists
-      if (user) {
-        //record the current user in local storage
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        //redirect the user to home page
-        router.push({ name: 'Home' });
-      } else {
-        errorMessage.value = 'Invalid username or password'
-      }
+      signInWithEmailAndPassword(getAuth(),email.value,password.value)
+      .then((data) => {
+        console.log("Login Successful")
+        router.push("/home")
+        console.log(auth.currentUser)
+      }).catch((error) => {
+        console.log(error.code)
+      })
     }
-
     const goToRegister = () => {
       //redirect the user to register page
       router.push({ name: 'Register' })
     }
 
     return {
-      username,
+      email,
       password,
       errorMessage,
       login,

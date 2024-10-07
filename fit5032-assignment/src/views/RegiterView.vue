@@ -5,7 +5,7 @@ import router from '@/router';
 
 //declare form data
 const formData = ref({
-  username: '',
+  email: '',
   password: '',
   confirmPassword: '',
   isAustralian: false,
@@ -15,12 +15,12 @@ const formData = ref({
   suburb: 'Clayton'
 })
 
-//declare users variable - initialise it with the users array in local storage. If it doen't exist, initialise it with an empty array
-const users = ref(JSON.parse(localStorage.getItem('users')) || [])
+//declare users variable
+
 const auth = getAuth()
 
 const submitForm = () => {
-  createUserWithEmailAndPassword(auth, username.value, password.value)
+  createUserWithEmailAndPassword(auth, email.value, password.value)
   .then((data) => {
     router.push({name : "Login"})
   }).catch((error) => {
@@ -30,7 +30,7 @@ const submitForm = () => {
 
 const clearForm = () => {
   formData.value = {
-    username: '',
+    email: '',
     password: '',
     confirmPassword: '',
     isAustralian: false,
@@ -42,7 +42,7 @@ const clearForm = () => {
 
 //define errors object
 const errors = ref({
-  username: null,
+  email: null,
   password: null,
   confirmPassword: null,
   resident: null,
@@ -53,11 +53,11 @@ const errors = ref({
 
 //validate name when user removes cursor from the input field
 const validateName = (blur) => {
-  //check username length
-  if (formData.value.username.length < 3) {
-    if (blur) errors.value.username = 'Name must be at least 3 characters'
+  //check email length
+  if (formData.value.email.length < 3) {
+    if (blur) errors.value.email = 'Name must be at least 3 characters'
   } else {
-    errors.value.username = null
+    errors.value.email = null
   }
 }
 
@@ -122,16 +122,16 @@ const validateReason = () => {
         <form @submit.prevent="submitForm">
           <div class="row mb-3">
             <div class="col-md-6 col-sm-6">
-              <label for="username" class="form-label">Username</label>
+              <label for="email" class="form-label">Email</label>
               <input
                 type="text"
                 class="form-control"
-                id="username"
+                id="email"
                 @blur="() => validateName(true)"
                 @input="() => validateName(false)"
-                v-model="formData.username"
+                v-model="formData.email"
               />
-              <div v-if="errors.username" class="text-danger">{{ errors.username }}</div>
+              <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
             </div>
 
             <div class="col-md-6 col-sm-6">
@@ -238,7 +238,7 @@ const validateReason = () => {
 }
 
 /* ID selectors */
-#username:focus,
+#email:focus,
 #password:focus,
 #isAustralian:focus,
 #isAdmin:focus,
