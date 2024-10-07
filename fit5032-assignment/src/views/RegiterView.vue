@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import LoginView from './LoginView.vue';
+import {getAuth, createUserWithEmailAndPassword} from "firebase/auth"
 import router from '@/router';
 
 //declare form data
@@ -17,21 +17,15 @@ const formData = ref({
 
 //declare users variable - initialise it with the users array in local storage. If it doen't exist, initialise it with an empty array
 const users = ref(JSON.parse(localStorage.getItem('users')) || [])
+const auth = getAuth()
 
 const submitForm = () => {
-  validateName(true)
-  validatePassword(true)
-  //when username and password are valid
-  if (!errors.value.username && !errors.value.password) {
-
-    //add the newly registered user to the users list
-    users.value.push({ ...formData.value })
-
-    //update users in the database
-    localStorage.setItem('users', JSON.stringify(users.value))
-    clearForm()
+  createUserWithEmailAndPassword(auth, username.value, password.value)
+  .then((data) => {
     router.push({name : "Login"})
-  }
+  }).catch((error) => {
+    console.log(error.code);
+  })
 }
 
 const clearForm = () => {
