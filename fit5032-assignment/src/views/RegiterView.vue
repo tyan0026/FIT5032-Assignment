@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import {getAuth, createUserWithEmailAndPassword} from "firebase/auth"
-import router from '@/router';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+import router from '@/router'
+import axios from 'axios'
 
 //declare form data
 const formData = ref({
@@ -21,11 +22,31 @@ const auth = getAuth()
 
 const submitForm = () => {
   createUserWithEmailAndPassword(auth, email.value, password.value)
-  .then((data) => {
-    router.push({name : "Login"})
-  }).catch((error) => {
-    console.log(error.code);
-  })
+    .then((data) => {
+      // User is successfully registered
+      const userEmail = email.value // The registered user's email
+
+      // Call email API to send a welcome email
+      axios
+        .post('http://localhost:5000/send-email', {
+          to: userEmail,
+          subject: 'Welcome to Our Platform!',
+          text: 'Thank you for registering. We are excited to have you on board.'
+        })
+        .then((response) => {
+          console.log('Welcome email sent successfully:', response.data)
+          // Redirect to login page
+          router.push({ name: 'Login' })
+        })
+        .catch((error) => {
+          console.error('Error sending welcome email:', error)
+          // Redirect even if the email fails
+          // router.push({ name: 'Login' })
+        })
+    })
+    .catch((error) => {
+      console.log(error)
+    })
 }
 
 const clearForm = () => {
@@ -60,7 +81,6 @@ const validateName = (blur) => {
     errors.value.email = null
   }
 }
-
 
 //validate password when user removes cursor from the input field
 const validatePassword = (blur) => {
