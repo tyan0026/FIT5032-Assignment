@@ -11,7 +11,7 @@
         </li>
         <li>
           <router-link to="/my-health" class="nav-link" active-class="active"
-            >My Health</router-link
+            >Caregivers</router-link
           >
         </li>
         <li>
@@ -20,13 +20,13 @@
         <li>
           <router-link to="/rating" class="nav-link" active-class="active">Rate Us</router-link>
         </li>
-        <li v-if="isAdmin">
+        <li v-if="user && user.isAdmin">
           <router-link to="/users" class="nav-link" active-class="active">Users</router-link>
         </li>
-        <li v-if="!isLoggedIn">
+        <li v-if="!user">
           <router-link to="/login" class="nav-link" active-class="active">Login</router-link>
         </li>
-        <li v-if="isLoggedIn">
+        <li v-if="user">
           <router-link to="/logout" class="nav-link" active-class="active">Logout</router-link>
         </li>
       </ul>
@@ -37,42 +37,62 @@
 <script>
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '../firebase/init.js'
 
 export default {
   setup() {
-    //define some variables to indicate the current user's status and role
-    //This is used to contionally display some buttons or pages
-    const isLoggedIn = ref(false)
-    const isAdmin = ref(false)
+    const user = ref(null)
+    const auth = getAuth()
 
     const route = useRoute()
 
-    const checkAuthStatus = () => {
-      //get the current user
-      const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+    // Function to get a user by email
+    const getUserByEmail = async (email) => {
+      try {
+        // Create a query against the collection.
+        const q = query(collection(db, 'users'), where('email', '==', email))
 
-      //if user exists, then there is a logged in user
-      isLoggedIn.value = currentUser != null
+        // Execute the query and get the documents
+        const querySnapshot = await getDocs(q)
 
-      //check if the logged in user is admin or not
-      if (currentUser) {
-        isAdmin.value = currentUser.isAdmin === true
+        // Check if any documents were returned
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            user.value = doc.data()
+          })
+        } else {
+          console.log('No matching documents.')
+        }
+      } catch (error) {
+        console.error('Error fetching user by email:', error)
       }
     }
 
-    // Watch for route changes and recheck authentication status
-    watch(route, () => {
-      checkAuthStatus()
+    onMounted(() => {
+      checkAuth()
     })
 
-    //check status on page load
-    onMounted(() => {
-      checkAuthStatus()
-    })
+    const checkAuth = () => {
+      onAuthStateChanged(auth, async (currentUser) => {
+        if (currentUser) {
+          try {
+            // Fetch the user data from Firestore by email
+            await getUserByEmail(currentUser.email)
+          } catch (error) {
+            console.error('Error fetching user data:', error)
+            user.value = null
+          }
+        } else {
+          // User is signed out
+          user.value = null
+        }
+      })
+    }
 
     return {
-      isLoggedIn,
-      isAdmin
+      user
     }
   }
 }

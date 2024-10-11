@@ -7,24 +7,12 @@
         <form @submit.prevent="login" class="card p-4">
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input
-              type="text"
-              id="email"
-              class="form-control"
-              v-model="email"
-              required
-            />
+            <input type="text" id="email" class="form-control" v-model="email" required />
           </div>
 
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="form-control"
-              v-model="password"
-              required
-            />
+            <input type="password" id="password" class="form-control" v-model="password" required />
           </div>
 
           <div class="text-center">
@@ -33,9 +21,9 @@
         </form>
 
         <p v-if="errorMessage" class="text-danger text-center mt-3">{{ errorMessage }}</p>
-        
+
         <p class="text-center mt-3">
-          Don't have an account? 
+          Don't have an account?
           <a @click="goToRegister" class="text-primary">Register here</a>
         </p>
       </div>
@@ -46,7 +34,7 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
 export default {
   setup() {
@@ -55,16 +43,15 @@ export default {
     const errorMessage = ref('')
     const router = useRouter()
 
-
     const login = () => {
-      signInWithEmailAndPassword(getAuth(),email.value,password.value)
-      .then((data) => {
-        console.log("Login Successful")
-        router.push("/home")
-        console.log(auth.currentUser)
-      }).catch((error) => {
-        console.log(error.code)
-      })
+      signInWithEmailAndPassword(getAuth(), email.value, password.value)
+        .then((data) => {
+          console.log('Login Successful')
+          router.push('/home')
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
     const goToRegister = () => {
       //redirect the user to register page

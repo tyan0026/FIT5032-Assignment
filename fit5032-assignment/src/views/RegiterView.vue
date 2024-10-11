@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 import router from '@/router'
 import axios from 'axios'
+import { db } from '../firebase/init.js'
+import { collection, addDoc } from 'firebase/firestore'
 
 //declare form data
 const formData = ref({
@@ -20,34 +22,32 @@ const formData = ref({
 
 const auth = getAuth()
 
-const submitForm = () => {
-  createUserWithEmailAndPassword(auth, email.value, password.value)
-    .then((data) => {
-      // User is successfully registered
-      const userEmail = email.value // The registered user's email
+const submitForm = async () => {
+  try {
+    // Register the user using Firebase Authentication
+    const data = await createUserWithEmailAndPassword(auth, email.value, password.value);
 
-      // Call email API to send a welcome email
-      axios
-        .post('http://localhost:5000/send-email', {
-          to: userEmail,
-          subject: 'Welcome to Our Platform!',
-          text: 'Thank you for registering. We are excited to have you on board.'
-        })
-        .then((response) => {
-          console.log('Welcome email sent successfully:', response.data)
-          // Redirect to login page
-          router.push({ name: 'Login' })
-        })
-        .catch((error) => {
-          console.error('Error sending welcome email:', error)
-          // Redirect even if the email fails
-          // router.push({ name: 'Login' })
-        })
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-}
+    // Add the form data to Firestore after user is created
+    await addDoc(collection(db, 'users'), formData.value);
+
+    // send a welcome email
+    const userEmail = email.value;
+
+    await axios.post('http://localhost:5000/send-email', {
+      to: userEmail,
+      subject: 'Welcome to Our Platform!',
+      text: 'Thank you for registering. We are excited to have you on board.'
+    });
+
+    console.log('Welcome email sent successfully.');
+
+    // Redirect to login page after successful registration
+    router.push({ name: 'Login' });
+  } catch (error) {
+    console.error('Error occurred during form submission:', error);
+  }
+};
+
 
 const clearForm = () => {
   formData.value = {

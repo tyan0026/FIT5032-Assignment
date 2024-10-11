@@ -19,7 +19,7 @@ const routes = [
   { path: '/services', name: 'Services', component: ServicesView },
   { path: '/users', name: 'Users', component: UsersView },
   { path: '/logout', name: 'Logout', component: LogoutView },
-  { path: '', name: 'Login', component: LoginView },
+  { path: '', name: 'DefaultLogin', component: LoginView },
 ]
 
 function isAuthenticated() {

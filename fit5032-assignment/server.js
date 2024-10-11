@@ -51,6 +51,26 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     .catch((error) => res.status(500).json({ error: error.message }));
 });
 
+
+
+// API endpoint to get all users
+app.get('/users', async (req, res) => {
+  try {
+    let users = [];
+    let listUsersResult = await admin.auth().listUsers();
+    listUsersResult.users.forEach((userRecord) => {
+      users.push({
+        uid: userRecord.uid,
+        email: userRecord.email,
+        displayName: userRecord.displayName,
+      });
+    });
+    res.status(200).send(users);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
