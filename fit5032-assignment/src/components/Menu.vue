@@ -71,10 +71,6 @@ export default {
     }
 
     onMounted(() => {
-      checkAuth()
-    })
-
-    const checkAuth = () => {
       onAuthStateChanged(auth, async (currentUser) => {
         if (currentUser) {
           try {
@@ -89,7 +85,7 @@ export default {
           user.value = null
         }
       })
-    }
+    })
 
     return {
       user

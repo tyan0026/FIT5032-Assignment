@@ -30,7 +30,7 @@
       <Column field="rating" header="Rating"></Column>
     </DataTable>
   </div>
-  <div style="margin-top: 20px;">
+  <div style="margin-top: 20px">
     <h2>Average Rating</h2>
     <p v-if="averageRating !== null">{{ averageRating.toFixed(2) }} / 5</p>
     <p v-else>No ratings yet.</p>
@@ -41,72 +41,125 @@
 import { ref, onMounted } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { getAuth } from 'firebase/auth'
+import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore'
+import { db } from '../firebase/init.js'
 
-const rating = ref(1)
+const getUserDocumentByEmail = async () => {
+  try {
+    // Get the currently authenticated user
+    const auth = getAuth()
+    const currentUser = auth.currentUser
 
-//get current user from database
-const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+    if (!currentUser) {
+      throw new Error('No authenticated user found')
+    }
 
-//get current user's username
-const currentUsername = currentUser ? currentUser.username : ''
+    // Query Firestore for the user document where the email matches currentUser.email
+    const q = query(collection(db, 'users'), where('email', '==', currentUser.email))
 
-const submitRating = () => {
-  //get all users from local storage
-  const users = JSON.parse(localStorage.getItem('users')) || []
+    // Execute the query and get the matching documents
+    const querySnapshot = await getDocs(q)
 
-  //find current user in the user list
-  const userIndex = users.findIndex((user) => user.username === currentUsername)
-
-  //if user is found
-  if (userIndex !== -1) {
-    //add or update its reting value
-    users[userIndex].rating = rating.value
-
-    //write the updated users list back to local storage
-    localStorage.setItem('users', JSON.stringify(users))
-
-    //reset the reting in the input field back to default 1
-    rating.value = 1
-
-    //notify the user 
-    window.alert('Thanks for your rating.')
-
-    //calculate the average rating
-    updateRatingsTable();
-    calculateAverageRating()
-  } else {
-    console.error('Current user not found.')
+    // Check if a matching document was found
+    if (!querySnapshot.empty) {
+      let userDocRef
+      querySnapshot.forEach((doc) => {
+        // doc.id gives the document ID, doc.data() gives the document data
+        userDocRef = doc.ref // This is the document reference
+        console.log('User document found:', doc.data())
+      })
+      return userDocRef // Return the document reference
+    } else {
+      console.log('No matching user document found')
+      return null
+    }
+  } catch (error) {
+    console.error('Error fetching user document by email:', error)
   }
 }
 
+const rating = ref(1)
 const averageRating = ref(null)
 const userRatings = ref([])
 
-const calculateAverageRating = () => {
+const calculateAverageRating = async () => {
+  try {
+    // Read the average rating from the 'metadata' collection in Firestore
+    const averageRatingDoc = await getDoc(doc(db, 'metadata', 'ratings'))
 
-  //get all existing users 
-  const users = JSON.parse(localStorage.getItem('users')) || []
-
-  // Extract ratings from user objects
-  const ratings = users.map((user) => user.rating).filter((rating) => rating != null)
-
-  if (ratings.length > 0) {
-    //Calculate total value 
-    const total = ratings.reduce((acc, curr) => acc + curr, 0)
-    averageRating.value = total / ratings.length
-  } else {
+    if (averageRatingDoc.exists) {
+      averageRating.value = averageRatingDoc.data().averageRating
+    } else {
+      averageRating.value = null
+    }
+  } catch (error) {
+    console.error('Error fetching average rating:', error)
     averageRating.value = null
   }
 }
 
-const updateRatingsTable = () => {
-  userRatings.value = JSON.parse(localStorage.getItem('users')).filter(a => a.rating != undefined) || []
+const updateRatingsTable = async () => {
+  try {
+    // Query the Firestore collection for all users
+    const querySnapshot = await getDocs(collection(db, 'users'))
+
+    // Extract users with ratings
+    const ratings = []
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data()
+      if (userData.rating !== undefined) {
+        ratings.push({
+          username: userData.email || 'Unknown User', // Assuming the username is stored in Firestore
+          rating: userData.rating
+        })
+      }
+    })
+
+    // Update the userRatings reactive variable
+    userRatings.value = ratings
+  } catch (error) {
+    console.error('Error updating ratings table:', error)
+  }
+}
+
+const submitRating = async () => {
+  try {
+    // Find the current user in Firestore based on email
+    const auth = getAuth()
+    const currentUser = auth.currentUser
+
+    if (!currentUser) {
+      console.error('No authenticated user found.')
+      return
+    }
+
+    // Get a reference to the Firestore document for the current user
+    const userDocRef = await getUserDocumentByEmail()
+
+    // Update the user's document with the rating value
+    await updateDoc(userDocRef, {
+      rating: rating.value
+    })
+
+    // Notify the user
+    window.alert('Thanks for your rating.')
+
+    // Update the ratings table and recalculate the average
+    updateRatingsTable()
+    calculateAverageRating()
+
+    // Reset the rating input to default (1)
+    rating.value = 1
+  } catch (error) {
+    console.error('Error updating user rating in Firestore:', error)
+  }
 }
 
 onMounted(() => {
   //make sure this method is called when page load
-  calculateAverageRating();
-  updateRatingsTable();
+  calculateAverageRating()
+  updateRatingsTable()
 })
 </script>
 

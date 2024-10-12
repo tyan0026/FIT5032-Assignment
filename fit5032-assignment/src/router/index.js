@@ -9,6 +9,8 @@ import LogoutView from '@/views/LogoutView.vue'
 import UsersView from '@/views/UsersView.vue'
 import RatingView from '@/views/RatingView.vue'
 
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+
 const routes = [
   { path: '/home', name: 'Home', component: HomeView },
   { path: '/login', name: 'Login', component: LoginView },
@@ -22,26 +24,25 @@ const routes = [
   { path: '', name: 'DefaultLogin', component: LoginView },
 ]
 
-function isAuthenticated() {
-  // Check if user details exist in localStorage
-  return localStorage.getItem('currentUser') != null
-}
-
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
 router.beforeEach((to, from, next) => {
-  // Check if the route requires authentication
+  const auth = getAuth();
 
-  console.log(to.name)
-  if (to.name !== undefined && to.name !== 'Login' && to.name !== 'Register' && !isAuthenticated()) {
-    window.alert('Please login first. ');
-    next({ name: 'Login' })
-  } else {
-    next()
-  }
-})
+  onAuthStateChanged(auth, (user) => {
+    // This listener checks if the user is authenticated or not
+    if (!user && to.name !== 'Login' && to.name !== 'Register') {
+      // If no user is authenticated, redirect to login
+      window.alert('Please login first.');
+      next({ name: 'Login' });
+    } else {
+      // Proceed to the route if the user is authenticated or no authentication is required
+      next();
+    }
+  });
+});
 
 export default router
