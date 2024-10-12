@@ -29,20 +29,20 @@ const router = createRouter({
   routes
 })
 
+
 router.beforeEach((to, from, next) => {
   const auth = getAuth();
 
-  onAuthStateChanged(auth, (user) => {
-    // This listener checks if the user is authenticated or not
-    if (!user && to.name !== 'Login' && to.name !== 'Register') {
-      // If no user is authenticated, redirect to login
-      window.alert('Please login first.');
-      next({ name: 'Login' });
-    } else {
-      // Proceed to the route if the user is authenticated or no authentication is required
-      next();
-    }
-  });
+  const user = auth.currentUser;  // Check the current authentication state
+
+  if (!user && to.name !== 'Login' && to.name !== 'Register' && to.name !== 'Logout') {
+    // If the user is not authenticated and trying to access protected routes, redirect to login
+    window.alert('Please login first.');
+    next({ name: 'Login' });
+  } else {
+    // If authenticated or accessing public routes, allow the navigation
+    next();
+  }
 });
 
 export default router

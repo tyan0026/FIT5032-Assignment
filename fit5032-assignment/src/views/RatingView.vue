@@ -83,10 +83,11 @@ const rating = ref(1)
 const averageRating = ref(null)
 const userRatings = ref([])
 
-const calculateAverageRating = async () => {
+const getAverageRating = async () => {
   try {
     // Read the average rating from the 'metadata' collection in Firestore
     const averageRatingDoc = await getDoc(doc(db, 'metadata', 'ratings'))
+    console.log(averageRatingDoc.data().averageRating)
 
     if (averageRatingDoc.exists) {
       averageRating.value = averageRatingDoc.data().averageRating
@@ -146,8 +147,8 @@ const submitRating = async () => {
     window.alert('Thanks for your rating.')
 
     // Update the ratings table and recalculate the average
-    updateRatingsTable()
-    calculateAverageRating()
+    await updateRatingsTable()
+    await getAverageRating()
 
     // Reset the rating input to default (1)
     rating.value = 1
@@ -156,10 +157,10 @@ const submitRating = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   //make sure this method is called when page load
-  calculateAverageRating()
-  updateRatingsTable()
+  await updateRatingsTable()
+  await getAverageRating()
 })
 </script>
 

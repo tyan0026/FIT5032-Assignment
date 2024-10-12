@@ -35,6 +35,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore'
+import { db } from '../firebase/init.js'
 
 export default {
   setup() {
@@ -43,10 +45,52 @@ export default {
     const errorMessage = ref('')
     const router = useRouter()
 
+    const getUserDocumentByEmail = async () => {
+      try {
+        // Get the currently authenticated user
+        const auth = getAuth()
+        const currentUser = auth.currentUser
+
+        if (!currentUser) {
+          throw new Error('No authenticated user found')
+        }
+
+        // Query Firestore for the user document where the email matches currentUser.email
+        const q = query(collection(db, 'users'), where('email', '==', currentUser.email))
+
+        // Execute the query and get the matching documents
+        const querySnapshot = await getDocs(q)
+
+        // Check if a matching document was found
+        if (!querySnapshot.empty) {
+          let userDocRef
+          querySnapshot.forEach((doc) => {
+            // doc.id gives the document ID, doc.data() gives the document data
+            userDocRef = doc.ref // This is the document reference
+            console.log('User document found:', doc.data())
+          })
+          return userDocRef // Return the document reference
+        } else {
+          console.log('No matching user document found')
+          return null
+        }
+      } catch (error) {
+        console.error('Error fetching user document by email:', error)
+      }
+    }
+
     const login = () => {
       signInWithEmailAndPassword(getAuth(), email.value, password.value)
-        .then((data) => {
+        .then(async (data) => {
           console.log('Login Successful')
+
+          const userDocRef = await getUserDocumentByEmail()
+
+          // Update the user's document with the rating value
+          await updateDoc(userDocRef, {
+            online: true
+          })
+
           router.push('/home')
         })
         .catch((error) => {
