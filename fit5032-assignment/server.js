@@ -20,37 +20,55 @@ app.use(cors());
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Define a route to handle email sending
-app.post('/send-email', (req, res) => {
+app.post('/send-email', async (req, res) => {
   const { to, subject, text } = req.body;
 
-  const pdfPath = join(__dirname, 'files/Policy.pdf')
-  const pdfFile = fs.readFileSync(pdfPath).toString('base64')
+  try {
+    const pdfPath = join(__dirname, 'files/Policy.pdf');
+    
+    // Check if the file exists
+    if (!fs.existsSync(pdfPath)) {
+      return res.status(404).json({ error: 'PDF file not found.' });
+    }
 
-  const msg = {
-    to,
-    from: 'yangtianning937@gmail.com', // verified SendGrid sender email
-    subject,
-    text,
-    attachments:[
-      {
-        content:pdfFile,
-        filename:'our policy.pdf',
-        type:'application/pdf',
-        desposition:'attachment'
-      }
-    ]
-  };
+    const pdfFile = fs.readFileSync(pdfPath).toString('base64');
 
-  // Set SendGrid API Key
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to,
+      from: 'yangtianning937@gmail.com', // Verified SendGrid sender email
+      subject,
+      text,
+      attachments: [
+        {
+          content: pdfFile,
+          filename: 'our policy.pdf',
+          type: 'application/pdf',
+          disposition: 'attachment', // Corrected spelling: 'disposition'
+        },
+      ],
+    };
 
-  sgMail
-    .send(msg)
-    .then(() => res.status(200).json({ message: 'Email sent successfully!' }))
-    .catch((error) => res.status(500).json({ error: error.message }));
+    // Set SendGrid API Key
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+    // Attempt to send the email
+    await sgMail.send(msg);
+    res.status(200).json({ message: 'Email sent successfully!' });
+  } catch (error) {
+    // Log the error details for easier debugging
+    console.error('SendGrid Error:', error);
+
+    // Check if it's a SendGrid-specific error
+    if (error.response) {
+      console.error('SendGrid Response:', error.response.body);
+    }
+
+    res.status(500).json({
+      error: 'Failed to send email.',
+      details: error.message, // Send brief details in response
+    });
+  }
 });
-
 
 
 // API endpoint to get all users
